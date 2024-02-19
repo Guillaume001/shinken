@@ -23,7 +23,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from shinken.util import safe_print
 from shinken.misc.sorter import hst_srv_sort, last_state_change_earlier
@@ -118,7 +118,7 @@ class DataManager(object):
         return self.rg.reactionners
 
     def get_program_start(self):
-        for c in self.rg.configs.values():
+        for c in list(self.rg.configs.values()):
             return c.program_start
         return None
 
@@ -133,7 +133,7 @@ class DataManager(object):
     # Get the hosts tags sorted by names, and zero size in the end
     def get_host_tags_sorted(self):
         r = []
-        names = self.rg.tags.keys()
+        names = list(self.rg.tags.keys())
         names.sort()
         for n in names:
             r.append((n, self.rg.tags[n]))
@@ -150,7 +150,7 @@ class DataManager(object):
     # Get the services tags sorted by names, and zero size in the end
     def get_service_tags_sorted(self):
         r = []
-        names = self.rg.services_tags.keys()
+        names = list(self.rg.services_tags.keys())
         names.sort()
         for n in names:
             r.append((n, self.rg.services_tags[n]))

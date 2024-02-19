@@ -28,7 +28,7 @@ about the configuration part. Parameters are merged in Service so it's
 no use in running part
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import six
 from shinken.objects.item import Item, Items

@@ -22,7 +22,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import time
 import calendar
@@ -85,7 +85,7 @@ class Timerange(object):
         m = re.match(pattern, entry)
         self.is_valid = m is not None
         if self.is_valid:
-            self.hstart, self.mstart, self.hend, self.mend = map(int, m.groups())
+            self.hstart, self.mstart, self.hend, self.mend = list(map(int, m.groups()))
 
     def __str__(self):
         return str(self.__dict__)
@@ -123,8 +123,8 @@ class Daterange(object):
         'june': 6, 'july': 7, 'august': 8, 'september': 9,
         'october': 10, 'november': 11, 'december': 12
     }
-    rev_weekdays = dict((v, k) for k, v in weekdays.items())
-    rev_months = dict((v, k) for k, v in months.items())
+    rev_weekdays = dict((v, k) for k, v in list(weekdays.items()))
+    rev_months = dict((v, k) for k, v in list(months.items()))
 
     def __init__(self, syear, smon, smday, swday, swday_offset,
                  eyear, emon, emday, ewday, ewday_offset, skip_interval, other):

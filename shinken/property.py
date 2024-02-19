@@ -23,7 +23,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import re
 
@@ -170,7 +170,7 @@ class BoolProp(Property):
         if isinstance(val, bool):
             return val
         val = unique_value(val).lower()
-        if val in _boolean_states.keys():
+        if val in list(_boolean_states.keys()):
             return _boolean_states[val]
         else:
             raise PythonizeError("Cannot convert '%s' to a boolean value" % val)

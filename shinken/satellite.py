@@ -34,7 +34,7 @@ If Arbiter wants it to have a new conf, the satellite forgets the previous
  Schedulers (and actions into) and takes the new ones.
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import six
 import sys
@@ -64,7 +64,7 @@ from shinken.util import get_memory, parse_memory_expr, free_memory
 from shinken.serializer import serialize, deserialize, SerializeError
 from shinken.stats import statsmgr
 if six.PY2:
-    from Queue import Empty, Queue
+    from queue import Empty, Queue
 else:
     from queue import Empty, Queue
 
@@ -211,7 +211,7 @@ class IStats(Interface):
             res[sched_id] = lst
             for mod in app.q_by_mod:
                 # In workers we've got actions send to queue - queue size
-                for (i, q) in app.q_by_mod[mod].items():
+                for (i, q) in list(app.q_by_mod[mod].items()):
                     lst.append({
                         'scheduler_name': sched['name'],
                         'module': mod,
@@ -263,7 +263,7 @@ class BaseSatellite(Daemon):
     # for me it's the ids of my schedulers
     def what_i_managed(self):
         r = {}
-        for (k, v) in self.schedulers.items():
+        for (k, v) in list(self.schedulers.items()):
             r[k] = v['push_flavor']
         return r
 
@@ -538,7 +538,7 @@ class Satellite(BaseSatellite):
     # modules and sockets
     def do_stop(self):
         logger.info("[%s] Stopping all workers", self.name)
-        for w in self.workers.values():
+        for w in list(self.workers.values()):
             try:
                 w.terminate()
                 w.join(timeout=1)
@@ -605,7 +605,7 @@ class Satellite(BaseSatellite):
             multiprocessing.active_children()
 
         w_to_del = []
-        for w in self.workers.values():
+        for w in list(self.workers.values()):
             # If a worker goes down and we did not ask him, it's not
             # good: we can think that we have a worker and it's not True
             # So we del it
@@ -626,7 +626,7 @@ class Satellite(BaseSatellite):
 
             for sched_id in self.schedulers:
                 sched = self.schedulers[sched_id]
-                for a in sched['actions'].values():
+                for a in list(sched['actions'].values()):
                     if a.status == 'queue' and a.worker_id == id:
                         # Got a check that will NEVER return if we do not
                         # restart it
@@ -763,7 +763,7 @@ class Satellite(BaseSatellite):
                         'poller_tags': ",".join(self.poller_tags),
                         'reactionner_tags': ",".join(self.reactionner_tags),
                         'worker_name': self.name,
-                        'module_types': ",".join(self.q_by_mod.keys()),
+                        'module_types': ",".join(list(self.q_by_mod.keys())),
                     }
                     slots = self.get_available_slots()
                     if slots is not None:
@@ -816,7 +816,7 @@ class Satellite(BaseSatellite):
     def get_actions_queue_len(self):
         actions = 0
         for mod in self.q_by_mod:
-            for q in self.q_by_mod[mod].values():
+            for q in list(self.q_by_mod[mod].values()):
                 actions += q.qsize()
         return actions
 
@@ -898,7 +898,7 @@ class Satellite(BaseSatellite):
             sched = self.schedulers[sched_id]
             for mod in self.q_by_mod:
                 # In workers we've got actions send to queue - queue size
-                for (i, q) in self.q_by_mod[mod].items():
+                for (i, q) in list(self.q_by_mod[mod].items()):
                     logger.debug("[%d][%s][%s] Stats: Workers:%d (Queued:%d TotalReturnWait:%d)",
                                  sched_id, sched['name'], mod,
                                  i, q.qsize(), self.get_returns_queue_len())
@@ -910,7 +910,7 @@ class Satellite(BaseSatellite):
         wait_ratio = self.wait_ratio.get_load()
         total_q = 0
         for mod in self.q_by_mod:
-            for q in self.q_by_mod[mod].values():
+            for q in list(self.q_by_mod[mod].values()):
                 total_q += q.qsize()
         if total_q != 0 and wait_ratio < 2 * self.polling_interval:
             logger.debug("I decide to up wait ratio")

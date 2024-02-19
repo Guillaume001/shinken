@@ -21,14 +21,14 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import io
 import six
 import traceback
 import zlib
 if six.PY2:
-    import cPickle as pickle
+    import pickle as pickle
 else:
     import pickle
 from shinken.safepickle import SafeUnpickler

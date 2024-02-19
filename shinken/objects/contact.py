@@ -23,7 +23,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from shinken.objects.item import Item, Items
 from shinken.util import strip_and_uniq
@@ -175,7 +175,7 @@ class Contact(Item):
         cls = self.__class__
 
         # All of the above are checks in the notificationways part
-        for prop, entry in cls.properties.items():
+        for prop, entry in list(cls.properties.items()):
             if prop not in _special_properties:
                 if not hasattr(self, prop) and entry.required:
                     logger.error("[contact::%s] %s property not set", self.get_name(), prop)

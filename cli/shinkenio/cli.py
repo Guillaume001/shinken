@@ -21,7 +21,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import pycurl
 import os
@@ -30,9 +30,9 @@ import stat
 import json
 import tempfile
 import tarfile
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import shutil
-from StringIO import StringIO
+from io import BytesIO
 from shinken.log import logger, cprint
 
 # Will be populated by the shinken CLI command
@@ -44,7 +44,6 @@ CONFIG = None
 def read_package_json(fd):
     buf = fd.read()
     fd.close()
-    buf = buf.decode('utf8', 'ignore')
     try:
         package_json = json.loads(buf)
     except ValueError as exp:
@@ -92,7 +91,7 @@ def create_archive(to_pack):
     tmp_file = os.path.join(tmp_dir, name+'.tar.gz')
     tar = tarfile.open(tmp_file, "w:gz")
     os.chdir(to_pack)
-    tar.add(".",arcname='.', exclude=tar_exclude_filter)
+    tar.add(".",arcname='.', filter=tar_exclude_filter)
     tar.close()
     logger.debug("Saved file %s", tmp_file)
     return tmp_file
@@ -171,7 +170,7 @@ def search(look_at):
         c.setopt(c.PROXY, proxy_socks5)
         c.setopt(c.PROXYTYPE, c.PROXYTYPE_SOCKS5)
     args = {'keywords':','.join(look_at)}
-    c.setopt(c.URL, str('shinken.io/searchcli?'+urllib.urlencode(args)))
+    c.setopt(c.URL, str('shinken.io/searchcli?'+urllib.parse.urlencode(args)))
     response = StringIO()
     c.setopt(pycurl.WRITEFUNCTION, response.write)
     #c.setopt(c.VERBOSE, 1)
@@ -376,20 +375,19 @@ def grab_local(d):
         raise Exception(err)
 
     # return True for files we want to exclude
-    def tar_exclude_filter(f):
+    def tar_exclude_filter(tarinfo):
+        file_name = os.path.basename(tarinfo.name)
         # if the file start with .git, we bail out
         # Also ending with ~ (Thanks emacs...)
-        if f.startswith('./.git'):
-            return True
-        if f.endswith('~'):
-            return True
-        return False
+        if file_name.startswith('.git') or file_name.endswith('~'):
+            return None
+        return tarinfo
 
     # Now prepare a destination file
     tmp_file  = tempfile.mktemp()
     tar = tarfile.open(tmp_file, "w:gz")
     os.chdir(to_pack)
-    tar.add(".",arcname='.', exclude=tar_exclude_filter)
+    tar.add(".",arcname='.', filter=tar_exclude_filter)
     tar.close()
     fd = open(tmp_file, 'rb')
     raw = fd.read()
@@ -419,7 +417,7 @@ def install_package(pname, raw, update_only=False):
     package_content = []
 
     # open a file with the content
-    f = StringIO(raw)
+    f = BytesIO(raw)
     tar_file = tarfile.open(fileobj=f, mode="r")
     logger.debug("Tar file contents:")
     for i in tar_file.getmembers():
@@ -431,7 +429,7 @@ def install_package(pname, raw, update_only=False):
             sys.exit(2)
             return
         # Adding all files into the package_content list
-        package_content.append( {'name':i.name, 'mode':i.mode, 'type':i.type, 'size':i.size} )
+        package_content.append( {'name':i.name, 'mode':i.mode, 'type':i.type.decode('utf-8'), 'size':i.size} )
         logger.debug("\t%s", path)
     # Extract all in the tmpdir
     tar_file.extractall(tmpdir)
@@ -551,9 +549,8 @@ def install_package(pname, raw, update_only=False):
         os.mkdir(p_inv)
     shutil.copy2(package_json_p, os.path.join(p_inv, 'package.json'))
     # and the package content
-    cont = open(os.path.join(p_inv, 'content.json'), 'w')
-    cont.write(json.dumps(package_content))
-    cont.close()
+    with open(os.path.join(p_inv, 'content.json'), 'w') as cont:
+        json.dump(package_content, cont)
 
     # We now clean (rm) the tmpdir we don't need any more
     try:

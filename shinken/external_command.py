@@ -23,7 +23,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import os
 import time
@@ -532,7 +532,7 @@ class ExternalCommandManager(object):
                 logger.info("Receiver pushing external command to scheduler %s", sched)
                 sched['external_commands'].append(extcmd)
         else:
-            for cfg in self.confs.values():
+            for cfg in list(self.confs.values()):
                 if cfg.hosts.find_by_name(host_name) is not None:
                     logger.debug("Host %s found in a configuration", host_name)
                     if cfg.is_assigned:

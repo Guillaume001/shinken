@@ -23,7 +23,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from shinken.util import strip_and_uniq
 
@@ -254,7 +254,7 @@ class ComplexExpressionFactory(object):
         pattern = pattern.strip()
 
         if pattern == '*':
-            obj = [h.host_name for h in self.all_elements.items.values()
+            obj = [h.host_name for h in list(self.all_elements.items.values())
                    if getattr(h, 'host_name', '') != '' and not h.is_tpl()]
             return obj, error
 
@@ -276,7 +276,7 @@ class ComplexExpressionFactory(object):
 
             # Maybe the hostgroup memebrs is '*', if so expand with all hosts
             if '*' in elts:
-                elts.extend([h.host_name for h in self.all_elements.items.values()
+                elts.extend([h.host_name for h in list(self.all_elements.items.values())
                              if getattr(h, 'host_name', '') != '' and not h.is_tpl()])
                 # And remove this strange hostname too :)
                 elts.remove('*')

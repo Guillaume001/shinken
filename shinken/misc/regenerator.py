@@ -22,7 +22,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import time
 
@@ -177,7 +177,7 @@ class Regenerator(object):
         logger.debug("In ALL Done linking phase for instance %s" % inst_id)
         # check if the instance is really defined, so got ALL the
         # init phase
-        if inst_id not in self.configs.keys():
+        if inst_id not in list(self.configs.keys()):
             logger.debug("Warning: the instance %d is not fully given, bailout" % inst_id)
             return
 
@@ -832,7 +832,7 @@ class Regenerator(object):
 
         # If we got an update about an unknown instance, cry and ask for a full
         # version!
-        if c_id not in self.configs.keys():
+        if c_id not in list(self.configs.keys()):
             # Do not ask data too quickly, very dangerous
             # one a minute
             if time.time() - self.last_need_data_send > 60 and self.from_q is not None:

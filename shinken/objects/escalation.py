@@ -23,7 +23,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from shinken.objects.item import Item, Items
 
@@ -154,7 +154,7 @@ class Escalation(Item):
         else:  # classic ones
             special_properties = _special_properties
 
-        for prop, entry in cls.properties.items():
+        for prop, entry in list(cls.properties.items()):
             if prop not in special_properties:
                 if not hasattr(self, prop) and entry.required:
                     logger.info('%s: I do not have %s', self.get_name(), prop)

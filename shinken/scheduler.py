@@ -23,7 +23,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import six
 import time
@@ -35,7 +35,7 @@ import traceback
 
 import threading
 if six.PY2:
-    from Queue import Empty
+    from queue import Empty
 else:
     from queue import Empty
 
@@ -246,11 +246,11 @@ class Scheduler(object):
         try:
             f = open(p, 'w')
             f.write('Scheduler DUMP at %d\n' % time.time())
-            for c in self.checks.values():
+            for c in list(self.checks.values()):
                 s = 'CHECK: %s:%s:%s:%s:%s:%s\n' % \
                     (c.id, c.status, c.t_to_go, c.poller_tag, c.command, c.worker)
                 f.write(s)
-            for a in self.actions.values():
+            for a in list(self.actions.values()):
                 s = '%s: %s:%s:%s:%s:%s:%s\n' % \
                     (a.__class__.my_type.upper(), a.id, a.status,
                      a.t_to_go, a.reactionner_tag, a.command, a.worker)
@@ -426,7 +426,7 @@ class Scheduler(object):
         if len(self.checks) > max_checks:
             # keys does not ensure sorted keys. Max is slow but we have no other way.
             id_max = max(self.checks.keys())
-            to_del_checks = [c for c in self.checks.values() if c.id < id_max - max_checks]
+            to_del_checks = [c for c in list(self.checks.values()) if c.id < id_max - max_checks]
             nb_checks_drops = len(to_del_checks)
             if nb_checks_drops > 0:
                 logger.info("I have to del some checks (%d)..., sorry", nb_checks_drops)
@@ -448,7 +448,7 @@ class Scheduler(object):
         # For broks and actions, it's more simple
         # or brosk, manage global but also all brokers queue
         b_lists = [self.broks]
-        for (bname, e) in self.brokers.items():
+        for (bname, e) in list(self.brokers.items()):
             b_lists.append(e['broks'])
         nb_broks_drops = 0
         for broks in b_lists:
@@ -636,7 +636,7 @@ class Scheduler(object):
 
         # If poller want to do checks
         if do_checks:
-            for c in sorted(self.checks.values(), key=get_prio):
+            for c in sorted(list(self.checks.values()), key=get_prio):
                 if max_actions is not None and len(res) >= max_actions:
                     break
                 #  If the command is untagged, and the poller too, or if both are tagged
@@ -657,7 +657,7 @@ class Scheduler(object):
 
         # If reactionner want to notify too
         if do_actions:
-            for a in sorted(self.actions.values(), key=get_prio):
+            for a in sorted(list(self.actions.values()), key=get_prio):
                 if max_actions is not None and len(res) >= max_actions:
                     break
                 is_master = (a.is_a == 'notification' and not a.contact)
@@ -837,7 +837,7 @@ class Scheduler(object):
     # We should push actions to our passives satellites
     def push_actions_to_passives_satellites(self):
         # We loop for our passive pollers or reactionners
-        for p in filter(lambda p: p['passive'], self.pollers.values()):
+        for p in [p for p in list(self.pollers.values()) if p['passive']]:
             logger.debug("I will send actions to the poller %s", p)
             con = p['con']
             poller_tags = p['poller_tags']
@@ -873,7 +873,7 @@ class Scheduler(object):
 
         # TODO:factorize
         # We loop for our passive reactionners
-        for p in filter(lambda p: p['passive'], self.reactionners.values()):
+        for p in [p for p in list(self.reactionners.values()) if p['passive']]:
             logger.debug("I will send actions to the reactionner %s", p)
             con = p['con']
             reactionner_tags = p['reactionner_tags']
@@ -913,7 +913,7 @@ class Scheduler(object):
     # We should get returns from satellites
     def get_actions_from_passives_satellites(self):
         # We loop for our passive pollers
-        for p in [p for p in self.pollers.values() if p['passive']]:
+        for p in [p for p in list(self.pollers.values()) if p['passive']]:
             logger.debug("I will get actions from the poller %s", p)
             con = p['con']
             poller_tags = p['poller_tags']
@@ -956,7 +956,7 @@ class Scheduler(object):
                 self.pynag_con_init(p['instance_id'], type='poller')
 
         # We loop for our passive reactionners
-        for p in [p for p in self.reactionners.values() if p['passive']]:
+        for p in [p for p in list(self.reactionners.values()) if p['passive']]:
             logger.debug("I will get actions from the reactionner %s", p)
             con = p['con']
             reactionner_tags = p['reactionner_tags']
@@ -996,7 +996,7 @@ class Scheduler(object):
     # simply ask their ref to manage it when it's ok to run
     def manage_internal_checks(self):
         now = time.time()
-        for c in self.checks.values():
+        for c in list(self.checks.values()):
             # must be ok to launch, and not an internal one (business rules based)
             if c.internal and c.status == 'scheduled' and c.is_launchable(now):
                 c.ref.manage_internal_check(self.hosts, self.services, c)
@@ -1071,7 +1071,7 @@ class Scheduler(object):
         for h in self.hosts:
             d = {}
             running_properties = h.__class__.running_properties
-            for prop, entry in running_properties.items():
+            for prop, entry in list(running_properties.items()):
                 if entry.retention:
                     v = getattr(h, prop)
                     # Maybe we should "prepare" the data before saving it
@@ -1083,7 +1083,7 @@ class Scheduler(object):
             # and some properties are also like this, like
             # active checks enabled or not
             properties = h.__class__.properties
-            for prop, entry in properties.items():
+            for prop, entry in list(properties.items()):
                 if entry.retention:
                     v = getattr(h, prop)
                     # Maybe we should "prepare" the data before saving it
@@ -1098,7 +1098,7 @@ class Scheduler(object):
         for s in self.services:
             d = {}
             running_properties = s.__class__.running_properties
-            for prop, entry in running_properties.items():
+            for prop, entry in list(running_properties.items()):
                 if entry.retention:
                     v = getattr(s, prop)
                     # Maybe we should "prepare" the data before saving it
@@ -1114,7 +1114,7 @@ class Scheduler(object):
                 # Same for properties, like active checks enabled or not
                 properties = s.__class__.properties
 
-                for prop, entry in properties.items():
+                for prop, entry in list(properties.items()):
                     # We save the value only if the attribute
                     # is selected for retention AND has been modified.
                     if entry.retention and \
@@ -1177,7 +1177,7 @@ class Scheduler(object):
         """
         # First manage all running properties
         running_properties = o.__class__.running_properties
-        for prop, entry in running_properties.items():
+        for prop, entry in list(running_properties.items()):
             if entry.retention:
                 # Maybe the saved one was not with this value, so
                 # we just bypass this
@@ -1186,14 +1186,14 @@ class Scheduler(object):
         # Ok, some are in properties too (like active check enabled
         # or not. Will OVERRIDE THE CONFIGURATION VALUE!
         properties = o.__class__.properties
-        for prop, entry in properties.items():
+        for prop, entry in list(properties.items()):
             if entry.retention:
                 # Maybe the saved one was not with this value, so
                 # we just bypass this
                 if prop in data:
                     setattr(o, prop, data[prop])
         # Now manage all linked oects load from previous run
-        for a in o.notifications_in_progress.values():
+        for a in list(o.notifications_in_progress.values()):
             a.ref = o
             self.add(a)
             # Also raises the action id, so do not overlap ids
@@ -1341,14 +1341,14 @@ class Scheduler(object):
 
         # Then we consume them
         # print("**********Consume*********")
-        for c in self.checks.values():
+        for c in list(self.checks.values()):
             if c.status == 'waitconsume':
                 item = c.ref
                 item.consume_result(c)
 
 
         # All 'finished' checks (no more dep) raise checks they depends on
-        for c in self.checks.values():
+        for c in list(self.checks.values()):
             if c.status == 'havetoresolvedep':
                 for dependent_checks in c.depend_on_me:
                     # Ok, now dependent will no more wait c
@@ -1357,7 +1357,7 @@ class Scheduler(object):
                 c.status = 'zombie'
 
         # Now, reinteger dep checks
-        for c in self.checks.values():
+        for c in list(self.checks.values()):
             if c.status == 'waitdep' and len(c.depend_on) == 0:
                 item = c.ref
                 item.consume_result(c)
@@ -1368,7 +1368,7 @@ class Scheduler(object):
     def delete_zombie_checks(self):
         # print("**********Delete zombies checks****")
         id_to_del = []
-        for c in self.checks.values():
+        for c in list(self.checks.values()):
             if c.status == 'zombie':
                 id_to_del.append(c.id)
         # une petite tape dans le dos et tu t'en vas, merci...
@@ -1382,7 +1382,7 @@ class Scheduler(object):
     def delete_zombie_actions(self):
         # print("**********Delete zombies actions****")
         id_to_del = []
-        for a in self.actions.values():
+        for a in list(self.actions.values()):
             if a.status == 'zombie':
                 id_to_del.append(a.id)
         # une petite tape dans le dos et tu t'en vas, merci...
@@ -1475,7 +1475,7 @@ class Scheduler(object):
                 dt.check_activation()
 
         # Check start and stop times
-        for dt in self.downtimes.values():
+        for dt in list(self.downtimes.values()):
             if dt.real_end_time < now:
                 # this one has expired
                 broks.extend(dt.exit())  # returns downtimestop notifications
@@ -1562,7 +1562,7 @@ class Scheduler(object):
     def check_orphaned(self):
         worker_names = {}
         now = int(time.time())
-        for c in self.checks.values():
+        for c in list(self.checks.values()):
             time_to_orphanage = c.ref.get_time_to_orphanage()
             if time_to_orphanage:
                 if c.status == 'inpoller' and c.t_to_go < now - time_to_orphanage:
@@ -1574,7 +1574,7 @@ class Scheduler(object):
                         worker_names[c.worker]["checks"] = 1
                         continue
                     worker_names[c.worker]["checks"] += 1
-        for a in self.actions.values():
+        for a in list(self.actions.values()):
             time_to_orphanage = a.ref.get_time_to_orphanage()
             if time_to_orphanage:
                 if a.status == 'inpoller' and a.t_to_go < now - time_to_orphanage:
@@ -1639,7 +1639,7 @@ class Scheduler(object):
         # Queues
         for s in ("scheduled", "inpoller", "zombie", "timeout",
                   "waitconsume", "waitdep", "havetoresolvedep"):
-            count = len([c for c in self.checks.values() if c.status == s])
+            count = len([c for c in list(self.checks.values()) if c.status == s])
             metrics.append(('core.scheduler.checks.%s' % s, count, 'queue'))
 
         # Latency
@@ -1705,7 +1705,7 @@ class Scheduler(object):
             all_commands[cmd] = (old_u_time, old_s_time)
         # now sort it
         p = []
-        for (c, e) in all_commands.items():
+        for (c, e) in list(all_commands.items()):
             u_time, s_time = e
             p.append({'cmd': c, 'u_time': u_time, 's_time': s_time})
 
@@ -1801,9 +1801,9 @@ class Scheduler(object):
             self.get_actions_from_passives_satellites()
 
             # stats
-            nb_scheduled = len([c for c in self.checks.values() if c.status == 'scheduled'])
-            nb_inpoller = len([c for c in self.checks.values() if c.status == 'inpoller'])
-            nb_zombies = len([c for c in self.checks.values() if c.status == 'zombie'])
+            nb_scheduled = len([c for c in list(self.checks.values()) if c.status == 'scheduled'])
+            nb_inpoller = len([c for c in list(self.checks.values()) if c.status == 'inpoller'])
+            nb_zombies = len([c for c in list(self.checks.values()) if c.status == 'zombie'])
             nb_notifications = len(self.actions)
 
             logger.debug("Checks: total %s, scheduled %s,"

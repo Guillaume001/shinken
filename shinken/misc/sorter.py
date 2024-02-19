@@ -27,7 +27,7 @@
 Helper functions for some sorting
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 
 # Sort hosts and services by impact, states and co

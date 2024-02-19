@@ -30,7 +30,7 @@
 # get the number of service in a host, you call a method to get the
 # len(host.services)
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import re
 import time

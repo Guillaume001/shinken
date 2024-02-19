@@ -23,7 +23,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from copy import copy
 
@@ -115,7 +115,7 @@ class Discoveryrule(MatchingItem):
         # Then running prop :)
         cls = self.__class__
         # adding running properties like latency, dependency list, etc
-        for prop, entry in cls.running_properties.items():
+        for prop, entry in list(cls.running_properties.items()):
             # Copy is slow, so we check type
             # Type with __iter__ are list or dict, or tuple.
             # Item need it's own list, so qe copy

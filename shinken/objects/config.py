@@ -28,7 +28,7 @@
  them into independent parts. The main user of this is Arbiter, but schedulers
  use it too (but far less)"""
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import six
 import re
@@ -842,7 +842,7 @@ class Config(Item):
     def load_params(self, params):
         clean_params = self.clean_params(params)
 
-        for key, value in clean_params.items():
+        for key, value in list(clean_params.items()):
 
             if key in self.properties:
                 val = self.properties[key].pythonize(clean_params[key])
@@ -889,7 +889,7 @@ class Config(Item):
             try:
                 # Open in Universal way for Windows, Mac, Linux
                 with open(file, 'r') as f:
-                    buf = map(six.u, f.readlines())
+                    buf = list(map(six.u, f.readlines()))
                 self.config_base_dir = os.path.dirname(file)
             except IOError as exp:
                 logger.error("[config] cannot open config file '%s' for reading: %s", file, exp)
@@ -1340,7 +1340,7 @@ class Config(Item):
         if os.name == 'nt' or not self.use_multiprocesses_serializer:
             logger.info('Using the default serialization pass')
             for r in self.realms:
-                for (i, conf) in r.confs.items():
+                for (i, conf) in list(r.confs.items()):
                     # Remember to protect the local conf hostgroups too!
                     conf.hostgroups.prepare_for_sending()
                     logger.debug('[%s] Serializing the configuration %d', r.get_name(), i)
@@ -1365,7 +1365,7 @@ class Config(Item):
             q = m.list()
             for r in self.realms:
                 processes = []
-                for (i, conf) in r.confs.items():
+                for (i, conf) in list(r.confs.items()):
                     # This function will be called by the children, and will give
                     def Serialize_config(q, rname, i, conf):
                         # Remember to protect the local conf hostgroups too!
@@ -1449,7 +1449,7 @@ class Config(Item):
     def notice_about_useless_parameters(self):
         if not self.disable_old_nagios_parameters_whining:
             properties = self.__class__.properties
-            for prop, entry in properties.items():
+            for prop, entry in list(properties.items()):
                 if isinstance(entry, UnusedProp):
                     logger.warning("The parameter %s is useless and can be removed "
                                    "from the configuration (Reason: %s)", prop, entry.text)
@@ -1460,7 +1460,7 @@ class Config(Item):
     def warn_about_unmanaged_parameters(self):
         properties = self.__class__.properties
         unmanaged = []
-        for prop, entry in properties.items():
+        for prop, entry in list(properties.items()):
             if not entry.managed and hasattr(self, prop):
                 if entry.help:
                     s = "%s: %s" % (prop, entry.help)
@@ -2301,7 +2301,7 @@ class Config(Item):
             cur_conf = self.confs[i] = Config()
 
             # Now we copy all properties of conf into the new ones
-            for prop, entry in Config.properties.items():
+            for prop, entry in list(Config.properties.items()):
                 if entry.managed and not isinstance(entry, UnusedProp):
                     val = getattr(self, prop)
                     setattr(cur_conf, prop, val)

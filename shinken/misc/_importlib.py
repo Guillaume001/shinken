@@ -2,7 +2,7 @@
 # While not critical (and in no way guaranteed!), it would be nice to keep this
 # code compatible with Python 2.3.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import sys
 

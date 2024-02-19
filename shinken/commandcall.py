@@ -22,7 +22,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import six
 from shinken.autoslots import AutoSlots
@@ -170,5 +170,5 @@ class CommandCall(six.with_metaclass(AutoSlots, DummyCommandCall)):
         'module_type': 'fork', 'command_name': 'notify-by-rss'})
         """
         for d in state:
-            for k, v in d.items():
+            for k, v in list(d.items()):
                 setattr(self, k, v)

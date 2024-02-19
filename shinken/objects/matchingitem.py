@@ -28,7 +28,7 @@
  discovery runners and rules.
 '''
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from shinken.objects.item import Item
 import re
@@ -83,7 +83,7 @@ class MatchingItem(Item):
         for m in self.matches:
             # print("Compare to", m)
             match_one = False
-            for (k, v) in datas.items():
+            for (k, v) in list(datas.items()):
                 # We found at least one of our match key
                 if m == k:
                     if self.is_matching(k, v):
@@ -101,7 +101,7 @@ class MatchingItem(Item):
         for m in self.not_matches:
             # print("Compare to NOT", m)
             match_one = False
-            for (k, v) in datas.items():
+            for (k, v) in list(datas.items()):
                 # print("K,V", k,v)
                 # We found at least one of our match key
                 if m == k:

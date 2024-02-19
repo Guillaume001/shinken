@@ -23,7 +23,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import six
 import zlib
@@ -32,7 +32,7 @@ import json
 import sys
 import io
 if six.PY2:
-    from urllib import urlencode
+    from urllib.parse import urlencode
 else:
     from urllib.parse import urlencode
 
@@ -165,7 +165,7 @@ class HTTPClient(object):
     # Try to get an URI path
     def post(self, path, args, wait='short'):
         size = 0
-        for (k, v) in args.items():
+        for (k, v) in list(args.items()):
             args[k] = serialize(v)
             size += len(args[k])
         # Ok go for it!

@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import collections
 import signal
@@ -48,7 +48,7 @@ class Sampler(object):
         elapsed = time.time() - self._started
         lines = ['elapsed {}'.format(elapsed),
                  'granularity {}'.format(self.interval)]
-        ordered_stacks = sorted(self._stack_counts.items(),
+        ordered_stacks = sorted(list(self._stack_counts.items()),
                                 key=lambda kv: kv[1], reverse=True)
         lines.extend(['{} {}'.format(frame, count)
                       for frame, count in ordered_stacks])

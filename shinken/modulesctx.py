@@ -23,7 +23,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import os
 import sys
@@ -53,9 +53,9 @@ class ModulesContext(object):
         # to keep it back-compatible with previous Shinken module way,
         # we first try with "import `mod_name`.module" and if we succeed
         # then that's the one to actually use:
-        mod = ModulesManager.try_best_load('.module', mod_name)
-        if mod:
-            return mod
+        #mod = ModulesManager.try_best_load('.module', mod_name)
+        #if mod:
+        #    return mod
         # otherwise simply try new and old style:
         return ModulesManager.try_load(mod_name, mod_dir)
 

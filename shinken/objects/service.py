@@ -26,7 +26,7 @@
 """ This Class is the service one, s it manage all service specific thing.
 If you look at the scheduling part, look at the scheduling item class"""
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import six
 import itertools
@@ -690,7 +690,7 @@ class Service(six.with_metaclass(AutoSlots, SchedulingItem)):
         special_properties = ('check_period', 'notification_interval', 'host_name',
                               'hostgroup_name', 'notification_period')
 
-        for prop, entry in cls.properties.items():
+        for prop, entry in list(cls.properties.items()):
             if prop not in special_properties:
                 if not hasattr(self, prop) and entry.required:
                     logger.error("The service %s on host '%s' does not have %s", desc, hname, prop)
@@ -1017,10 +1017,7 @@ class Service(six.with_metaclass(AutoSlots, SchedulingItem)):
 
     # The last time when the state was not OK
     def last_time_non_ok_or_up(self):
-        non_ok_times = list(filter(
-            lambda x: x > self.last_time_ok,
-            [self.last_time_warning, self.last_time_critical, self.last_time_unknown]
-        ))
+        non_ok_times = list([x for x in [self.last_time_warning, self.last_time_critical, self.last_time_unknown] if x > self.last_time_ok])
         if len(non_ok_times) == 0:
             last_time_non_ok = 0  # program_start would be better
         else:
@@ -1396,8 +1393,8 @@ class Services(Items):
 
     # Inheritance for just a property
     def apply_partial_inheritance(self, prop):
-        for i in itertools.chain(self.items.values(),
-                                 self.templates.values()):
+        for i in itertools.chain(list(self.items.values()),
+                                 list(self.templates.values())):
             i.get_property_by_inheritance(prop, 0)
             # If a "null" attribute was inherited, delete it
             try:
@@ -1415,21 +1412,21 @@ class Services(Items):
         cls = self.inner_class
         for prop in cls.properties:
             self.apply_partial_inheritance(prop)
-        for i in itertools.chain(self.items.values(),
-                                 self.templates.values()):
+        for i in itertools.chain(list(self.items.values()),
+                                 list(self.templates.values())):
             i.get_customs_properties_by_inheritance(0)
 
 
     def linkify_templates(self):
         # First we create a list of all templates
-        for i in itertools.chain(self.items.values(),
-                                 self.templates.values()):
+        for i in itertools.chain(list(self.items.values()),
+                                 list(self.templates.values())):
             self.linkify_item_templates(i)
 
         # Then we set the tags issued from the built templates
         # for i in self:
-        for i in itertools.chain(self.items.values(),
-                                 self.templates.values()):
+        for i in itertools.chain(list(self.items.values()),
+                                 list(self.templates.values())):
             i.tags = self.get_all_tags(i)
 
 
@@ -1827,7 +1824,7 @@ class Services(Items):
         # items::explode_trigger_string_into_triggers
         self.explode_trigger_string_into_triggers(triggers)
 
-        for t in self.templates.values():
+        for t in list(self.templates.values()):
             self.explode_contact_groups_into_contacts(t, contactgroups)
             self.explode_services_from_templates(hosts, t)
 

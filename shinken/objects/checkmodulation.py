@@ -23,7 +23,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from shinken.objects.item import Item, Items
 from shinken.property import StringProp
@@ -74,7 +74,7 @@ class CheckModulation(Item):
             for err in self.configuration_errors:
                 logger.error("[item::%s] %s", self.get_name(), err)
 
-        for prop, entry in cls.properties.items():
+        for prop, entry in list(cls.properties.items()):
             if prop not in cls._special_properties:
                 if not hasattr(self, prop) and entry.required:
                     logger.warning("[checkmodulation::%s] %s property not set",

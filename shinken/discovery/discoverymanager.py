@@ -23,7 +23,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import six
 import sys
@@ -57,7 +57,7 @@ def get_uuid(self):
     if uuid:
         return uuid.uuid1().hex
     # Ok for old python like 2.4, we will lie here :)
-    return int(random.random() * sys.maxint)
+    return int(random.random() * sys.maxsize)
 
 
 # Look if the name is a IPV4 address or not
@@ -104,7 +104,7 @@ class DiscoveredHost(object):
     def update_properties(self, final_phase=False):
         d = {}
         if final_phase:
-            for (k, v) in self.data.items():
+            for (k, v) in list(self.data.items()):
                 if k.startswith('_'):
                     d[k] = v
         else:
@@ -118,7 +118,7 @@ class DiscoveredHost(object):
         self.matched_rules.sort(by_order)
 
         for r in self.matched_rules:
-            for k, v in r.writing_properties.items():
+            for k, v in list(r.writing_properties.items()):
                 # If it's a + (add) property, append
                 if k.startswith('+'):
                     kprop = k[1:]
@@ -147,7 +147,7 @@ class DiscoveredHost(object):
                         d[kprop].append(prop)
 
             # Now look for - (rem) property
-            for k, v in r.writing_properties.items():
+            for k, v in list(r.writing_properties.items()):
                 if k.startswith('-'):
                     kprop = k[1:]
                     if kprop in d:
@@ -158,7 +158,7 @@ class DiscoveredHost(object):
                                 d[kprop].remove(prop)
 
         # Change join prop list in string with a ',' separator
-        for (k, v) in d.items():
+        for (k, v) in list(d.items()):
             if isinstance(d[k], list):
                 d[k] = ','.join(d[k])
 
@@ -167,7 +167,7 @@ class DiscoveredHost(object):
 
         # For macro-resolving, we should have our macros too
         self.customs = {}
-        for (k, v) in self.properties.items():
+        for (k, v) in list(self.properties.items()):
             self.customs['_' + k.upper()] = v
 
 
@@ -428,7 +428,7 @@ class DiscoveryManager(object):
             print('\n')
             print('LOOP' * 10, i)
             still_loop = False
-            for (name, dh) in self.disco_data.items():
+            for (name, dh) in list(self.disco_data.items()):
                 dh.update_properties()
                 to_run = dh.get_to_run()
                 print('Still to run for', name, to_run)
@@ -489,7 +489,7 @@ class DiscoveryManager(object):
 
     # Now we try to match all our hosts with the rules
     def match_rules(self):
-        for (name, dh) in self.disco_data.items():
+        for (name, dh) in list(self.disco_data.items()):
             for r in self.discoveryrules:
                 # If the rule was already successfully for this host, skip it
                 if r in dh.matched_rules:
@@ -612,7 +612,7 @@ class DiscoveryManager(object):
                     dhb = self.disco_data[oname]
                     # When same host but different properties are detected
                     if dha.name == dhb.name and dha.properties != dhb.properties:
-                        for (k, v) in dhb.properties.items():
+                        for (k, v) in list(dhb.properties.items()):
                             # Merge host macros if their properties are different
                             if k.startswith('_') and \
                                     k in dha.properties and dha.properties[k] != dhb.properties[k]:
@@ -701,7 +701,7 @@ class DiscoveryManager(object):
 
         # print("Generate services for", host)
         # print(srv_rules)
-        for (desc, rules) in srv_rules.items():
+        for (desc, rules) in list(srv_rules.items()):
             d = {'service_description': desc, 'host_name': host}
             for r in rules:
                 d.update(r.writing_properties)
@@ -744,7 +744,7 @@ class DiscoveryManager(object):
     # Create a define t { } with data in d
     def get_cfg_bufer(self, d, t):
         tab = ['define %s {' % t]
-        for (key, value) in d.items():
+        for (key, value) in list(d.items()):
             tab.append('  %s   %s' % (key, value))
         tab.append('}\n')
         return '\n'.join(tab)

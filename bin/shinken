@@ -29,9 +29,10 @@ import six
 import shlex
 import readline
 import signal
+import importlib.util
 
 if six.PY2:
-    import ConfigParser as configparser
+    import configparser as configparser
 else:
     import configparser
 
@@ -100,22 +101,22 @@ class ConfigParserWithComments(configparser.RawConfigParser):
     def write(self, fp):
         """Write an .ini-format representation of the configuration state."""
         if self._defaults:
-            fp.write("[%s]\n" % configparser.DEFAULTSECT)
-            for (key, value) in self._defaults.items():
+            fp.write("[{}]\n".format(configparser.DEFAULTSECT).encode())
+            for (key, value) in list(self._defaults.items()):
                 self._write_item(fp, key, value)
-            fp.write("\n")
+            fp.write(b"\n")
         for section in self._sections:
-            fp.write("[%s]\n" % section)
-            for (key, value) in self._sections[section].items():
+            fp.write("[{}]\n".format(section).encode())
+            for (key, value) in list(self._sections[section].items()):
                 self._write_item(fp, key, value)
-            fp.write("\n")
+            fp.write(b"\n")
     
     
     def _write_item(self, fp, key, value):
         if key.startswith(';') and value is None:
-            fp.write("%s\n" % (key[1:],))
+            fp.write("{}\n".format(key[1:]).encode())
         else:
-            fp.write("%s = %s\n" % (key, str(value).replace('\n', '\n\t')))
+            fp.write("{} = {}\n".format(key, str(value).replace('\n', '\n\t')).encode())
 
 
 # Commander is the main class for managing the CLI session and behavior
@@ -180,11 +181,13 @@ class CLICommander(object):
                 # Let's load it, but first att it to sys.path
                 sys.path.append(d)
                 # Load this PATH/cli.py file
-                m = imp.load_source(dname, f)
+                spec = importlib.util.spec_from_file_location(dname, f)
+                m = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(m)
                 # Link the CONFIG objet into it
                 m.CONFIG = self.config
                 exports = getattr(m, 'exports', {})
-                for (f, v) in exports.iteritems():
+                for (f, v) in exports.items():
                     m_keywords = v.get('keywords', [])
                     for k in m_keywords:
                         e = {'f'          : f,
@@ -196,7 +199,7 @@ class CLICommander(object):
                 
                 # And now the configuration part
                 mconfig = getattr(m, 'configurations', {})
-                for (p, e) in mconfig.iteritems():
+                for (p, e) in mconfig.items():
                     if p not in self.config:
                         self.ini_defaults[p] = e
                         new_config_param = True
@@ -243,7 +246,7 @@ class CLICommander(object):
         
         while True:
             try:
-                line = raw_input('> ')
+                line = input('> ')
             except EOFError:
                 cprint('')
                 break
@@ -346,7 +349,7 @@ def write_ini_file(cfg, CLI, opts):
     new_cfg = ConfigParserWithComments()
     modify = False
     if not cfg:
-        cfg = ConfigParser.ConfigParser()
+        cfg = configparser.ConfigParser()
     
     # Import data from the loaded configuration
     for section in cfg.sections():
@@ -355,7 +358,7 @@ def write_ini_file(cfg, CLI, opts):
         for (k, v) in cfg.items(section):
             new_cfg.set(section, k, v)
     
-    for (s, d) in CLI.ini_defaults.iteritems():
+    for (s, d) in CLI.ini_defaults.items():
         comment = d.get('comment', '')
         values = d.get('values', [])
         if not cfg.has_section(s) and not new_cfg.has_section(s):
@@ -425,7 +428,7 @@ def main(custom_args=None):
         logger.debug('Missing configuration file!')
         CONFIG['shinken.io'] = {}
     else:
-        cfg = ConfigParser.ConfigParser()
+        cfg = configparser.ConfigParser()
         cfg.read(opts.iniconfig)
         for section in cfg.sections():
             if section not in CONFIG:
@@ -509,13 +512,13 @@ def main(custom_args=None):
             sys.exit(0)
         cprint("Available commands:\n")
         all_from = {}
-        for (k, m) in CLI.keywords.iteritems():
+        for (k, m) in CLI.keywords.items():
             came_from = m['came_from']
             if came_from not in all_from:
                 all_from[came_from] = [(k, m)]
             else:
                 all_from[came_from].append((k, m))
-        _mods = all_from.keys()
+        _mods = list(all_from.keys())
         _mods.sort()
         for mod_name in _mods:
             d = all_from[mod_name]

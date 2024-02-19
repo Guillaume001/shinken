@@ -23,7 +23,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import six
 import time
@@ -333,7 +333,7 @@ class SatelliteLink(Item):
 
             # Ok protect against json that is chaning keys as string instead of int
             tab_cleaned = {}
-            for (k, v) in tab.items():
+            for (k, v) in list(tab.items()):
                 try:
                     tab_cleaned[int(k)] = v
                 except ValueError:
@@ -411,7 +411,7 @@ class SatelliteLink(Item):
     def prepare_for_conf(self):
         self.cfg = {'global': {}, 'schedulers': {}, 'arbiters': {}}
         properties = self.__class__.properties
-        for prop, entry in properties.items():
+        for prop, entry in list(properties.items()):
             if entry.to_send:
                 self.cfg['global'][prop] = getattr(self, prop)
         cls = self.__class__

@@ -22,7 +22,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import six
 import os
@@ -41,8 +41,8 @@ import subprocess
 import socket
 import io
 if six.PY2:
-    import ConfigParser as configparser
-    from Queue import Empty
+    import configparser as configparser
+    from queue import Empty
 else:
     from queue import Empty
     import configparser
@@ -191,7 +191,7 @@ class Interface(object):
     doc = 'List the api methods and their parameters'
     def api_full(self):
         res = {}
-        for (fname, f) in self.app.http_daemon.registered_fun.items():
+        for (fname, f) in list(self.app.http_daemon.registered_fun.items()):
             fclean = fname.replace('_', '-')
             argspec = inspect.getargspec(f)
             args = [a for a in argspec.args if a != 'self']
@@ -199,7 +199,7 @@ class Interface(object):
             e = {}
             # Get a string about the args and co
             _s_nondef_args = ', '.join([a for a in args if a not in defaults])
-            _s_def_args = ', '.join(['%s=%s' % (k, v) for (k, v) in defaults.items()])
+            _s_def_args = ', '.join(['%s=%s' % (k, v) for (k, v) in list(defaults.items())])
             _s_args = ''
             if _s_nondef_args:
                 _s_args += _s_nondef_args
@@ -995,7 +995,7 @@ class Daemon(object):
         else:
             logger.warning("No config file specified, use defaults parameters")
         # Now fill all defaults where missing parameters
-        for prop, entry in properties.items():
+        for prop, entry in list(properties.items()):
             if not hasattr(self, prop):
                 value = entry.pythonize(entry.default)
                 setattr(self, prop, value)
@@ -1006,7 +1006,7 @@ class Daemon(object):
     def relative_paths_to_full(self, reference_path):
         # print("Create relative paths with", reference_path)
         properties = self.__class__.properties
-        for prop, entry in properties.items():
+        for prop, entry in list(properties.items()):
             if isinstance(entry, ConfigPathProp):
                 path = getattr(self, prop)
                 if not os.path.isabs(path):

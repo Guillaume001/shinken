@@ -23,7 +23,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import six
 from shinken.objects.item import Item, Items
@@ -105,7 +105,7 @@ class Command(six.with_metaclass(AutoSlots, Item)):
     def fill_data_brok_from(self, data, brok_type):
         cls = self.__class__
         # Now config properties
-        for prop, entry in cls.properties.items():
+        for prop, entry in list(cls.properties.items()):
             # Is this property intended for broking?
             # if 'fill_brok' in entry[prop]:
             if brok_type in entry.fill_brok:
@@ -145,7 +145,7 @@ class Command(six.with_metaclass(AutoSlots, Item)):
     # 'module_type': 'fork', 'command_name': 'notify-by-rss'})
     def __setstate_pre_1_0__(self, state):
         for d in state:
-            for k, v in d.items():
+            for k, v in list(d.items()):
                 setattr(self, k, v)
 
 

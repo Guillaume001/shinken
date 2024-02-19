@@ -23,7 +23,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 """ This is the main class for the Host ext info. In fact it's mainly
 about the configuration part. Parameters are merged in Hosts so it's

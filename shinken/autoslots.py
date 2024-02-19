@@ -29,7 +29,7 @@
  so we do not have to add manually all properties to the __slots__
  list when we add a new entry"""
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 
 class AutoSlots(type):

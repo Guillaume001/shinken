@@ -22,7 +22,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import six
 import os
@@ -66,7 +66,7 @@ class Trigger(Item):
         self = ctx
 
         # Ok we can declare for this trigger call our functions
-        for (n, f) in trigger_functions.items():
+        for (n, f) in list(trigger_functions.items()):
             locals()[n] = f
 
         code = myself.code_bin  # Comment? => compile(myself.code_bin, "<irc>", "exec")

@@ -23,7 +23,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import copy
 from shinken.objects.item import Item
@@ -333,7 +333,7 @@ class Realms(Itemgroups):
     # We just search for each realm the others realms
     # and replace the name by the realm
     def linkify_p_by_p(self):
-        for p in self.items.values():
+        for p in list(self.items.values()):
             mbrs = p.get_realm_members()
             # The new member list, in id
             new_mbrs = []
@@ -346,10 +346,10 @@ class Realms(Itemgroups):
 
         # Now put higher realm in sub realms
         # So after they can
-        for p in self.items.values():
+        for p in list(self.items.values()):
             p.higher_realms = []
 
-        for p in self.items.values():
+        for p in list(self.items.values()):
             self.recur_higer_realms(p, p.realm_members)
 
 
@@ -366,7 +366,7 @@ class Realms(Itemgroups):
     def explode(self):
         # We do not want a same hg to be explode again and again
         # so we tag it
-        for tmp_p in self.items.values():
+        for tmp_p in list(self.items.values()):
             tmp_p.already_explode = False
         for p in self:
             if p.has('realm_members') and not p.already_explode:
@@ -377,7 +377,7 @@ class Realms(Itemgroups):
                 p.get_realms_by_explosion(self)
 
         # We clean the tags
-        for tmp_p in self.items.values():
+        for tmp_p in list(self.items.values()):
             if hasattr(tmp_p, 'rec_tag'):
                 del tmp_p.rec_tag
             del tmp_p.already_explode

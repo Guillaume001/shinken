@@ -21,7 +21,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import os
 from shinken.log import logger
@@ -34,14 +34,14 @@ CONFIG = None
 def serve(port):
     port = int(port)
     logger.info("Serving documentation at port %s", port)
-    import SimpleHTTPServer
-    import SocketServer
+    import http.server
+    import socketserver
     doc_dir   = CONFIG['paths']['doc']
     html_dir  = os.path.join(doc_dir, 'build', 'html')
     os.chdir(html_dir)
     try:
-        Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
-        httpd = SocketServer.TCPServer(("", port), Handler)
+        Handler = http.server.SimpleHTTPRequestHandler
+        httpd = socketserver.TCPServer(("", port), Handler)
         httpd.serve_forever()
     except KeyboardInterrupt:
         pass

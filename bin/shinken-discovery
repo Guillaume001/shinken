@@ -118,16 +118,16 @@ if args:
 
 backend = opts.backend or None
 
-print "Macros", raw_macros
+print("Macros", raw_macros)
 
 for m in raw_macros:
     elts = m.split('=')
     if len(elts) < 2:
-        print "The macro '%s' is malformed. I bail out" % m
+        print("The macro '%s' is malformed. I bail out" % m)
         sys.exit(2)
     macros.append((elts[0], '='.join(elts[1:])))
 
-print "Got macros", macros
+print("Got macros", macros)
 
 #    # We search if our potential parent is present in the
 #    # other detected hosts. If so, set it as my parent

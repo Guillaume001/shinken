@@ -85,7 +85,7 @@
 #        MONTH DAY
 #
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import time
 import re
@@ -763,7 +763,7 @@ class Timeperiod(Item):
     def fill_data_brok_from(self, data, brok_type):
         cls = self.__class__
         # Now config properties
-        for prop, entry in cls.properties.items():
+        for prop, entry in list(cls.properties.items()):
             # Is this property intended for broking?
             # if 'fill_brok' in entry:
             if brok_type in entry.fill_brok:
@@ -804,16 +804,16 @@ class Timeperiods(Items):
         r = True
         # We do not want a same hg to be explode again and again
         # so we tag it
-        for tp in self.items.values():
+        for tp in list(self.items.values()):
             tp.rec_tag = False
 
-        for tp in self.items.values():
-            for tmp_tp in self.items.values():
+        for tp in list(self.items.values()):
+            for tmp_tp in list(self.items.values()):
                 tmp_tp.rec_tag = False
             r &= tp.check_exclude_rec()
 
         # We clean the tags
-        for tp in self.items.values():
+        for tp in list(self.items.values()):
             del tp.rec_tag
 
         # And check all timeperiods for correct (sunday is false)

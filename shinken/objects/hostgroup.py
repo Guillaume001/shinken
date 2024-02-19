@@ -23,7 +23,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from shinken.objects.itemgroup import Itemgroup, Itemgroups
 
@@ -201,18 +201,18 @@ class Hostgroups(Itemgroups):
     def explode(self):
         # We do not want a same hg to be explode again and again
         # so we tag it
-        for tmp_hg in self.items.values():
+        for tmp_hg in list(self.items.values()):
             tmp_hg.already_explode = False
-        for hg in self.items.values():
+        for hg in list(self.items.values()):
             if hg.has('hostgroup_members') and not hg.already_explode:
                 # get_hosts_by_explosion is a recursive
                 # function, so we must tag hg so we do not loop
-                for tmp_hg in self.items.values():
+                for tmp_hg in list(self.items.values()):
                     tmp_hg.rec_tag = False
                 hg.get_hosts_by_explosion(self)
 
         # We clean the tags
-        for tmp_hg in self.items.values():
+        for tmp_hg in list(self.items.values()):
             if hasattr(tmp_hg, 'rec_tag'):
                 del tmp_hg.rec_tag
             del tmp_hg.already_explode

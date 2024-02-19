@@ -21,7 +21,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import six
 import time
@@ -377,12 +377,12 @@ def get_obj_full_name(obj):
 # return the list of keys of the custom dict
 # but without the _ before
 def get_customs_keys(d):
-    return [k[1:] for k in d.keys()]
+    return [k[1:] for k in list(d.keys())]
 
 
 # return the values of the dict
 def get_customs_values(d):
-    return d.values()
+    return list(d.values())
 
 
 # Checks that a parameter has an unique value. If it's a list, the last

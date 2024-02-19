@@ -23,7 +23,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import six
 import sys
@@ -448,7 +448,7 @@ class HTTPDaemon(object):
         ]
         if merge != []:
             methods_in = [
-                m.__name__ for m in obj.__class__.__dict__.values()
+                m.__name__ for m in list(obj.__class__.__dict__.values())
                 if inspect.isfunction(m)
             ]
             methods = [m for m in methods if m[0] in methods_in]
@@ -468,10 +468,10 @@ class HTTPDaemon(object):
             # If we got some defauts, save arg=value so we can lookup
             # for them after
             if defaults:
-                default_args = zip(
+                default_args = list(zip(
                     argspec.args[-len(argspec.defaults):],
                     argspec.defaults
-                )
+                ))
                 _d = {}
                 for (argname, defavalue) in default_args:
                     _d[argname] = defavalue

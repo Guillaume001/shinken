@@ -28,7 +28,7 @@ to look at the schedulingitem class that manage all
 scheduling/consume check smart things :)
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import six
 import time
@@ -716,7 +716,7 @@ class Host(six.with_metaclass(AutoSlots, SchedulingItem)):
 
         special_properties = ['check_period', 'notification_interval',
                               'notification_period']
-        for prop, entry in cls.properties.items():
+        for prop, entry in list(cls.properties.items()):
             if prop not in special_properties:
                 if not hasattr(self, prop) and entry.required:
                     logger.error("[host::%s] %s property not set", self.get_name(), prop)
@@ -1571,7 +1571,7 @@ class Hosts(Items):
         # items::explode_trigger_string_into_triggers
         self.explode_trigger_string_into_triggers(triggers)
 
-        for t in self.templates.values():
+        for t in list(self.templates.values()):
             # items::explode_contact_groups_into_contacts
             # take all contacts from our contact_groups into our contact property
             self.explode_contact_groups_into_contacts(t, contactgroups)

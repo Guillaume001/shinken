@@ -25,7 +25,7 @@
 
 # In android, we should use threads, not process
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 try:
     import android
@@ -47,7 +47,7 @@ import signal
 import traceback
 import multiprocessing
 if six.PY2:
-    from Queue import Queue, Empty
+    from queue import Queue, Empty
 else:
     from queue import Queue, Empty
 

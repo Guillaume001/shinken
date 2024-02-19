@@ -27,7 +27,7 @@
 
 # And itemgroup is like a item, but it's a group of items :)
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from shinken.objects.item import Item, Items
 
@@ -96,7 +96,7 @@ class Itemgroup(Item):
     # If a prop is absent and is not required, put the default value
     def fill_default(self):
         cls = self.__class__
-        for prop, entry in cls.properties.items():
+        for prop, entry in list(cls.properties.items()):
             if not hasattr(self, prop) and not entry.required:
                 value = entry.default
                 setattr(self, prop, value)
@@ -154,7 +154,7 @@ class Itemgroup(Item):
         cls = self.__class__
         data = {}
         # Now config properties
-        for prop, entry in cls.properties.items():
+        for prop, entry in list(cls.properties.items()):
             if entry.fill_brok != []:
                 if self.has(prop):
                     data[prop] = getattr(self, prop)

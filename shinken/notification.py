@@ -23,7 +23,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import time
 import six
@@ -196,7 +196,7 @@ class Notification(six.with_metaclass(AutoSlots, Action)):
     def fill_data_brok_from(self, data, brok_type):
         cls = self.__class__
         # Now config properties
-        for prop, entry in cls.properties.items():
+        for prop, entry in list(cls.properties.items()):
             if brok_type in entry.fill_brok:
                 data[prop] = getattr(self, prop)
 

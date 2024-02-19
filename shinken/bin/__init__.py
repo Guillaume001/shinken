@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # -*- coding: utf-8 -*-
 
@@ -29,11 +29,11 @@ Arbiter, Scheduler, etc. It just checks for the main requirement of
 Shinken.
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import sys
 
-VERSION = "3.0.0-RC1"
+VERSION = "3.0.0rc1"
 
 
 # Make sure people are using Python 2.6 or higher

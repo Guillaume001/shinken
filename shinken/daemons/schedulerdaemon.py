@@ -22,7 +22,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import six
 import os
@@ -165,9 +165,9 @@ class IStats(Interface):
     def get_raw_stats(self):
         sched = self.app.sched
         res = {}
-        res['nb_scheduled'] = len([c for c in sched.checks.values() if c.status == 'scheduled'])
-        res['nb_inpoller'] = len([c for c in sched.checks.values() if c.status == 'inpoller'])
-        res['nb_zombies'] = len([c for c in sched.checks.values() if c.status == 'zombie'])
+        res['nb_scheduled'] = len([c for c in list(sched.checks.values()) if c.status == 'scheduled'])
+        res['nb_inpoller'] = len([c for c in list(sched.checks.values()) if c.status == 'inpoller'])
+        res['nb_zombies'] = len([c for c in list(sched.checks.values()) if c.status == 'zombie'])
         res['nb_notifications'] = len(sched.actions)
 
         # Spare scehdulers do not have such properties
@@ -298,7 +298,7 @@ class Shinken(BaseSatellite):
             s.compensate_system_time_change(difference)
 
         # Now all checks and actions
-        for c in self.sched.checks.values():
+        for c in list(self.sched.checks.values()):
             # Already launch checks should not be touch
             if c.status == 'scheduled' and c.t_to_go is not None:
                 t_to_go = c.t_to_go
@@ -320,7 +320,7 @@ class Shinken(BaseSatellite):
                     ref.next_chk = new_t
 
         # Now all checks and actions
-        for c in self.sched.actions.values():
+        for c in list(self.sched.actions.values()):
             # Already launch checks should not be touch
             if c.status == 'scheduled':
                 t_to_go = c.t_to_go

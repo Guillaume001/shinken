@@ -25,10 +25,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from bisect import bisect_left, insort
-from itertools import izip, repeat
+from itertools import repeat
 
 
 def dictdoc(method):
@@ -61,7 +61,7 @@ class SortedDict(dict):
     @dictdoc
     def __repr__(self):
         return 'SortedDict({%s})' % ', '.join('%r: %r' % item
-                                              for item in self.iteritems())
+                                              for item in self.items())
 
     @dictdoc
     def __str__(self):
@@ -126,7 +126,7 @@ class SortedDict(dict):
     @classmethod
     @dictdoc
     def fromkeys(cls, seq, value=None):
-        return cls(izip(seq, repeat(value)))
+        return cls(zip(seq, repeat(value)))
 
     @dictdoc
     def pop(self, key, *args, **kwargs):

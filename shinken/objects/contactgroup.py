@@ -28,7 +28,7 @@
 # Contactgroups are groups for contacts
 # They are just used for the config read and explode by elements
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from shinken.objects.itemgroup import Itemgroup, Itemgroups
 from shinken.property import IntegerProp, StringProp
@@ -158,19 +158,19 @@ class Contactgroups(Itemgroups):
     def explode(self):
         # We do not want a same hg to be explode again and again
         # so we tag it
-        for tmp_cg in self.items.values():
+        for tmp_cg in list(self.items.values()):
             tmp_cg.already_explode = False
 
-        for cg in self.items.values():
+        for cg in list(self.items.values()):
             if cg.has('contactgroup_members') and not cg.already_explode:
                 # get_contacts_by_explosion is a recursive
                 # function, so we must tag hg so we do not loop
-                for tmp_cg in self.items.values():
+                for tmp_cg in list(self.items.values()):
                     tmp_cg.rec_tag = False
                 cg.get_contacts_by_explosion(self)
 
         # We clean the tags
-        for tmp_cg in self.items.values():
+        for tmp_cg in list(self.items.values()):
             if hasattr(tmp_cg, 'rec_tag'):
                 del tmp_cg.rec_tag
             del tmp_cg.already_explode
