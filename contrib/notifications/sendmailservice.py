@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #   Autor: David Hannequin <david.hannequin@gmail.com>
 #   Date: 24 Oct 2011
 

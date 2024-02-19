@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 #   Autors: David Hannequin <david.hannequin@gmail.com>,
 #           Hartmut Goebel <h.goebel@crazy-compilers.com>
